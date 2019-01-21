@@ -14,6 +14,9 @@ const PathEnvioPeticion string = "/envio"
 //PathListadoPeticiones Ruta de obtención de las peticiones de hoy
 const PathListadoPeticiones string = "/lista"
 
+//PathActualizacionPeticiones Ruta de actualización de las peticiones de hoy
+const PathActualizacionPeticiones string = "/actualizacion"
+
 //ManejadorHTTP encapsula como tipo la función de manejo de peticiones HTTP, para que sea posible almacenar sus referencias en un diccionario
 type ManejadorHTTP = func(w http.ResponseWriter, r *http.Request)
 
@@ -26,4 +29,5 @@ func init() {
 	Manejadores[PathJSFiles] = JsFile
 	Manejadores[PathEnvioPeticion] = Insert
 	Manejadores[PathListadoPeticiones] = List
+	Manejadores[PathActualizacionPeticiones] = Update
 }

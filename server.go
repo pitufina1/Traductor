@@ -22,6 +22,7 @@ func main() {
 	//http.HandleFunc("/js/", hnd.Js)
 	//http.HandleFunc("/envio", hnd.Insert)
 	//http.HandleFunc("/lista", hnd.List)
+	//http.HandleFunc("/actualizacion", hnd.Update)
 
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), nil))
 	fmt.Println("Servidor abierto en http://localhost:" + strconv.Itoa(port))

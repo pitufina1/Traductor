@@ -9,16 +9,17 @@ type Peticion struct {
 
 //Filtro struct
 type Filtro struct {
-	Fecha time.Time
+	Palabra string
 }
 
 //Idioma struct
 type Idioma struct {
-	lenguaje string
+	Nombre string
 }
 
 //Traduccion struct
 type Traduccion struct {
-	palabratraducida string
-	fechaconsulta    time.Time
+	PalabraTraducida string
+	FechaInicio      time.Time
+	FechaConsulta    time.Time
 }
