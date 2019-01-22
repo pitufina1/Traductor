@@ -38,7 +38,7 @@ $(document).ready(function() {
 
 function ActualizarHistorial() {
     var filtro = {
-        fecha: moment().format('YYYY-MM-DDT00:00:00Z')
+        texto: texto
     };
     $.ajax({
         url: "/lista",
@@ -65,8 +65,9 @@ function Historial_UI(array) {
         for(var x = 0; x < array.length; x++) {
             tbody.append(
                 "<tr><td>" + array[x].ID + 
-                "</td><td>" + array[x].Palabra + 
-                "</td><td>" + moment(array[x].Fecha).format("DD-MM-YY HH:mm:ssZ") + 
+                "</td><td>" + array[x].Texto + 
+                "</td><td>" + array[x].Palabra_ID + 
+                "</td><td>" + array[x].Idioma_ID + 
                 "</td></tr>");
         }
     } else {

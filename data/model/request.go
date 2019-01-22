@@ -1,15 +1,13 @@
 package model
 
-import "time"
-
-//Peticion struct
-type Peticion struct {
-	Palabra string
+//Palabra struct
+type Palabra struct {
+	Texto string
 }
 
 //Filtro struct
 type Filtro struct {
-	Palabra string
+	Nombre string
 }
 
 //Idioma struct
@@ -19,7 +17,5 @@ type Idioma struct {
 
 //Traduccion struct
 type Traduccion struct {
-	PalabraTraducida string
-	FechaInicio      time.Time
-	FechaConsulta    time.Time
+	Texto string
 }

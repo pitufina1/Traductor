@@ -8,8 +8,8 @@ import (
 	_ "github.com/go-sql-driver/mysql" ///El driver se registra en database/sql en su función Init(). Es usado internamente por éste
 )
 
-//InsertarPeticion test
-func InsertarPeticion(objeto *model.Peticion) {
+//InsertarPalabra test
+func InsertarPalabra(objeto *model.Palabra) {
 	db, err := sql.Open("mysql", "ubuntu:ubuntu@tcp(localhost:3306)/Traductor")
 
 	if err != nil {
@@ -17,15 +17,15 @@ func InsertarPeticion(objeto *model.Peticion) {
 	}
 
 	defer db.Close()
-	insert, err := db.Query("INSERT INTO Peticion(palabra) VALUES (?)", objeto.Palabra)
+	insert, err := db.Query("INSERT INTO Traduccion(texto, palabra_id, idioma_id) VALUES (?, ?, ?)", objeto.Texto)
 	if err != nil {
 		panic(err.Error())
 	}
 	insert.Close()
 }
 
-//ActualizarPeticion test
-func ActualizarPeticion(objeto *model.Peticion) {
+//ActualizarPalabra test
+func ActualizarPalabra(objeto *model.Filtro) []model.RTraduccion {
 	db, err := sql.Open("mysql", "ubuntu:ubuntu@tcp(localhost:3306)/Traductor")
 
 	if err != nil {
@@ -33,7 +33,7 @@ func ActualizarPeticion(objeto *model.Peticion) {
 	}
 
 	defer db.Close()
-	insert, err := db.Query("UPDATE Peticion SET Peticion.Palabra = ? WHERE Peticion.ID = ?", objeto.Palabra)
+	insert, err := db.Query("UPDATE Traduccion SET T.Texto = P.Texto FROM Traduccion T INNER JOIN Palabra P ON T.Palabra_ID = P.ID", objeto.Nombre)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -41,30 +41,28 @@ func ActualizarPeticion(objeto *model.Peticion) {
 }
 
 //ListarRegistros test
-func ListarRegistros(objeto *model.Filtro) []model.RPeticion {
-	db, err := sql.Open("mysql", "ubuntu:ubuntu@tcp(localhost:3306)/Traductor?parseTime=true")
+func ListarRegistros(objeto *model.Filtro) []model.RTraduccion {
+	db, err := sql.Open("mysql", "ubuntu:ubuntu@tcp(localhost:3306)/Traductor")
 
 	if err != nil {
 		panic(err.Error())
 	}
 
 	defer db.Close()
-	comando := "SELECT * FROM Peticion WHERE (palabra <= '" + objeto.Palabra + "')"
+	comando := "SELECT * FROM Idioma WHERE (nombre <= '" + objeto.Nombre + "')"
 	fmt.Println(comando)
-	query, err := db.Query("SELECT  Peticion.Palabra, Idioma.Nombre AS Idioma, Traduccion.PalabraTraducida AS Traducción FROM Traductor.Traduccion
-	INNER JOIN Idioma ON Traduccion.Idioma_ID = Idioma.ID
-	INNER JOIN Peticion ON Traduccion.Peticion_ID = Peticion.ID", objeto.Palabra)
+	query, err := db.Query("SELECT * FROM Idioma WHERE (nombre >= ?) ", objeto.Nombre)
 
 	if err != nil {
 		panic(err.Error())
 	}
 	defer query.Close()
 
-	resultado := make([]model.RPeticion, 0)
+	resultado := make([]model.RTraduccion, 0)
 	for query.Next() {
-		var fila = model.RPeticion{}
+		var fila = model.RTraduccion{}
 
-		err = query.Scan(&fila.ID, &fila.Palabra, &fila.Nombre, &fila.PalabraTraducida, &fila.FechaInicio, &fila.FechaConsulta)
+		err = query.Scan(&fila.ID, &fila.Texto, &fila.Palabra_ID, &fila.Idioma_ID)
 		if err != nil {
 			panic(err.Error())
 		}

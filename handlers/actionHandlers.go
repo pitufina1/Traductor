@@ -10,10 +10,10 @@ import (
 	"traductor/data/model"
 )
 
-//Insert Función que inserta una petición en la base de datos local
+//Insert Función que inserta una palabra en la base de datos local
 func Insert(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Incoming request from " + r.URL.EscapedPath())
-	if r.URL.Path != PathEnvioPeticion {
+	if r.URL.Path != PathEnvioPalabras {
 		http.NotFound(w, r)
 		return
 	}
@@ -26,16 +26,16 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 	bytes, e := ioutil.ReadAll(r.Body)
 
 	if e == nil {
-		var peticion model.Peticion
+		var palabra model.Palabra
 		enTexto := string(bytes)
 		fmt.Println("En texto: " + enTexto)
-		_ = json.Unmarshal(bytes, &peticion)
+		_ = json.Unmarshal(bytes, &palabra)
 
-		if peticion.Palabra != "" {
-			peticion.Palabra = strings.ToUpper(peticion.Palabra)
+		if palabra.Texto != "" {
+			palabra.Texto = strings.ToUpper(palabra.Texto)
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprintln(w, "La petición está vacía")
+			fmt.Fprintln(w, "La palabra está vacía")
 			return
 		}
 
@@ -43,20 +43,20 @@ func Insert(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Add("Content-Type", "application/json")
 
-		respuesta, _ := json.Marshal(peticion)
+		respuesta, _ := json.Marshal(palabra)
 		fmt.Fprint(w, string(respuesta))
 
-		go client.InsertarPeticion(&peticion)
+		go client.InsertarPalabra(&palabra)
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(w, e)
 	}
 }
 
-//List Función que devuelve las peticiones de la base de datos dado un filtro
+//List Función que devuelve las palabras de la base de datos dado un filtro
 func List(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Incoming request from " + r.URL.EscapedPath())
-	if r.URL.Path != PathListadoPeticiones {
+	if r.URL.Path != PathListadoPalabras {
 		http.NotFound(w, r)
 		return
 	}
@@ -82,7 +82,7 @@ func List(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, string(respuesta))
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprintln(w, "La petición no pudo ser parseada")
+			fmt.Fprintln(w, "La palabra no pudo ser parseada")
 			fmt.Fprintln(w, e.Error())
 			return
 		}
@@ -93,10 +93,10 @@ func List(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//Update Función que actualiza una petición en la base de datos local
+//Update Función que actualiza una palabra en la base de datos local
 func Update(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Incoming request from " + r.URL.EscapedPath())
-	if r.URL.Path != PathEnvioPeticion {
+	if r.URL.Path != PathEnvioPalabras {
 		http.NotFound(w, r)
 		return
 	}
@@ -109,16 +109,16 @@ func Update(w http.ResponseWriter, r *http.Request) {
 	bytes, e := ioutil.ReadAll(r.Body)
 
 	if e == nil {
-		var peticion model.Peticion
+		var palabra model.Palabra
 		enTexto := string(bytes)
 		fmt.Println("En texto: " + enTexto)
-		_ = json.Unmarshal(bytes, &peticion)
+		_ = json.Unmarshal(bytes, &palabra)
 
-		if peticion.Palabra != "" {
-			peticion.Palabra = strings.ToUpper(peticion.Palabra)
+		if palabra.Texto != "" {
+			palabra.Texto = strings.ToUpper(palabra.Texto)
 		} else {
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprintln(w, "La petición está vacía")
+			fmt.Fprintln(w, "La palabra está vacía")
 			return
 		}
 
@@ -126,10 +126,90 @@ func Update(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Add("Content-Type", "application/json")
 
-		respuesta, _ := json.Marshal(peticion)
+		respuesta, _ := json.Marshal(palabra)
 		fmt.Fprint(w, string(respuesta))
 
-		go client.InsertarPeticion(&peticion)
+		go client.InsertarPalabra(&palabra)
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintln(w, e)
+	}
+}
+
+//Idioma Función que devuelve los Idiomas de la base de datos dado un filtro
+func Idioma(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Incoming request from " + r.URL.EscapedPath())
+	if r.URL.Path != PathIdioma {
+		http.NotFound(w, r)
+		return
+	}
+	if r.Method != http.MethodPost {
+		http.NotFound(w, r)
+		return
+	}
+	defer r.Body.Close()
+	bytes, e := ioutil.ReadAll(r.Body)
+
+	if e == nil {
+		var filtro model.Filtro
+		e = json.Unmarshal(bytes, &filtro)
+
+		if e == nil {
+			lista := client.ListarRegistros(&filtro)
+
+			w.WriteHeader(http.StatusOK)
+
+			w.Header().Add("Content-Type", "application/json")
+
+			respuesta, _ := json.Marshal(&lista)
+			fmt.Fprint(w, string(respuesta))
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintln(w, "La palabra no pudo ser parseada")
+			fmt.Fprintln(w, e.Error())
+			return
+		}
+
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprintln(w, e)
+	}
+}
+
+//Traduccion Función que devuelve las traducciones de la base de datos dado un filtro
+func Traduccion(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Incoming request from " + r.URL.EscapedPath())
+	if r.URL.Path != PathTraduccion {
+		http.NotFound(w, r)
+		return
+	}
+	if r.Method != http.MethodPost {
+		http.NotFound(w, r)
+		return
+	}
+	defer r.Body.Close()
+	bytes, e := ioutil.ReadAll(r.Body)
+
+	if e == nil {
+		var filtro model.Filtro
+		e = json.Unmarshal(bytes, &filtro)
+
+		if e == nil {
+			lista := client.ListarRegistros(&filtro)
+
+			w.WriteHeader(http.StatusOK)
+
+			w.Header().Add("Content-Type", "application/json")
+
+			respuesta, _ := json.Marshal(&lista)
+			fmt.Fprint(w, string(respuesta))
+		} else {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprintln(w, "La palabra no pudo ser parseada")
+			fmt.Fprintln(w, e.Error())
+			return
+		}
+
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 		fmt.Fprintln(w, e)

@@ -1,23 +1,19 @@
 package model
 
-import "time"
-
-//RPeticion struct
-type RPeticion struct {
-	ID               int
-	Palabra          string
-	Nombre           string
-	PalabraTraducida string
-	FechaInicio      time.Time
-	FechaConsulta    time.Time
+//RPalabra struct
+type RPalabra struct {
+	ID    int
+	Texto string
 }
 
 type RIdioma struct {
-	ID int
+	ID     int
+	Nombre string
 }
 
 type RTraduccion struct {
-	ID          int
-	Peticion_ID int
-	Idioma_ID   int
+	ID         int
+	Texto      string
+	Palabra_ID int
+	Idioma_ID  int
 }
